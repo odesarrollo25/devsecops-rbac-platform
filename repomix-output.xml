@@ -1,0 +1,1373 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.github/
+  workflows/
+    ci.yml
+infraestructura/
+  terraform/
+    .gitkeep
+orquestacion/
+  k3s/
+    .gitkeep
+servicios/
+  api-gateway/
+    app/
+      __init__.py
+      main.py
+    Dockerfile
+    requirements.txt
+  audit-service/
+    app/
+      __init__.py
+      main.py
+    Dockerfile
+    requirements.txt
+  excel-worker/
+    app/
+      __init__.py
+      worker.py
+    Dockerfile
+    requirements.txt
+  identity-service/
+    app/
+      __init__.py
+      main.py
+    Dockerfile
+    requirements.txt
+  rbac-service/
+    app/
+      __init__.py
+      config.py
+      database.py
+      main.py
+      models.py
+      schemas.py
+    Dockerfile
+    requirements.txt
+  sync-service/
+    app/
+      __init__.py
+      main.py
+    Dockerfile
+    requirements.txt
+tests/
+  .gitkeep
+.env.example
+.gitignore
+docker-compose.yml
+LICENSE
+README.md
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".github/workflows/ci.yml">
+
+</file>
+
+<file path="infraestructura/terraform/.gitkeep">
+
+</file>
+
+<file path="orquestacion/k3s/.gitkeep">
+
+</file>
+
+<file path="servicios/api-gateway/app/__init__.py">
+
+</file>
+
+<file path="servicios/api-gateway/Dockerfile">
+FROM python:3.14-slim
+
+WORKDIR /app
+
+RUN useradd --create-home --shell /bin/bash appuser
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app ./app
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+</file>
+
+<file path="servicios/api-gateway/requirements.txt">
+fastapi
+uvicorn[standard]
+httpx
+</file>
+
+<file path="servicios/audit-service/app/__init__.py">
+
+</file>
+
+<file path="servicios/audit-service/app/main.py">
+from datetime import datetime, timezone
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+
+app = FastAPI(
+    title="Audit Service",
+    version="0.1.0",
+)
+
+
+class AuditEvent(BaseModel):
+    user_id: str
+    action: str
+    service: str
+    status: str
+    details: str | None = None
+
+
+@app.get("/health")
+def health():
+    return {
+        "service": "audit-service",
+        "status": "healthy",
+    }
+
+
+@app.post("/audit/events")
+def create_audit_event(event: AuditEvent):
+    return {
+        "message": "Audit event received",
+        "event": event.model_dump(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+</file>
+
+<file path="servicios/audit-service/Dockerfile">
+FROM python:3.14-slim
+
+WORKDIR /app
+
+RUN useradd --create-home --shell /bin/bash appuser
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app ./app
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+</file>
+
+<file path="servicios/audit-service/requirements.txt">
+fastapi
+uvicorn[standard]
+pydantic
+</file>
+
+<file path="servicios/excel-worker/app/__init__.py">
+
+</file>
+
+<file path="servicios/excel-worker/app/worker.py">
+import time
+
+
+def main():
+    print("Excel Worker started")
+
+    while True:
+        print("Excel Worker waiting for jobs...")
+        time.sleep(30)
+
+
+if __name__ == "__main__":
+    main()
+</file>
+
+<file path="servicios/excel-worker/Dockerfile">
+FROM python:3.14-slim
+
+WORKDIR /app
+
+RUN useradd --create-home --shell /bin/bash appuser
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app ./app
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+CMD ["python", "app/worker.py"]
+</file>
+
+<file path="servicios/excel-worker/requirements.txt">
+
+</file>
+
+<file path="servicios/identity-service/app/__init__.py">
+
+</file>
+
+<file path="servicios/identity-service/Dockerfile">
+FROM python:3.14-slim
+
+WORKDIR /app
+
+RUN useradd --create-home --shell /bin/bash appuser
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app ./app
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+</file>
+
+<file path="servicios/rbac-service/app/__init__.py">
+
+</file>
+
+<file path="servicios/rbac-service/app/config.py">
+import os
+
+
+DATABASE_URL = os.environ["DATABASE_URL"]
+JWT_SECRET = os.environ["JWT_SECRET"]
+JWT_ALGORITHM = "HS256"
+</file>
+
+<file path="servicios/rbac-service/app/database.py">
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from app.config import DATABASE_URL
+
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+)
+
+SessionLocal = sessionmaker(
+    bind=engine,
+    autocommit=False,
+    autoflush=False,
+)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+</file>
+
+<file path="servicios/rbac-service/app/models.py">
+from datetime import datetime
+from uuid import UUID
+
+from sqlalchemy import (
+    BigInteger,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class Application(Base):
+    __tablename__ = "applications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    code: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+
+
+class Position(Base):
+    __tablename__ = "positions"
+
+    id: Mapped[int] = mapped_column(
+    	BigInteger,
+    	primary_key=True,
+    	autoincrement=True,
+    )
+    company_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    code: Mapped[str] = mapped_column(String(50), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+
+
+class Role(Base):
+    __tablename__ = "roles"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id"),
+        nullable=False,
+    )
+    position_id: Mapped[int | None] = mapped_column(
+        ForeignKey("positions.id"),
+        nullable=True,
+    )
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
+    description: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+
+
+class Permission(Base):
+    __tablename__ = "permissions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class RolePermission(Base):
+    __tablename__ = "role_permissions"
+
+    role_id: Mapped[int] = mapped_column(
+        ForeignKey("roles.id"),
+        primary_key=True,
+    )
+    permission_id: Mapped[int] = mapped_column(
+        ForeignKey("permissions.id"),
+        primary_key=True,
+    )
+
+
+class UserRole(Base):
+    __tablename__ = "user_roles"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    role_id: Mapped[int] = mapped_column(
+        ForeignKey("roles.id"),
+        primary_key=True,
+    )
+    assigned_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+
+
+class CompanyApplication(Base):
+    __tablename__ = "company_applications"
+
+    company_id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+    )
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id"),
+        primary_key=True,
+    )
+    assigned_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+</file>
+
+<file path="servicios/rbac-service/app/schemas.py">
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict
+
+
+class ApplicationCreate(BaseModel):
+    name: str
+    code: str
+
+
+class ApplicationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    code: str
+    created_at: datetime
+
+class PositionCreate(BaseModel):
+    company_id: int
+    name: str
+    code: str
+
+
+class PositionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    company_id: int
+    name: str
+    code: str
+    created_at: datetime
+
+class PermissionCreate(BaseModel):
+    name: str
+    detail: str | None = None
+
+
+class PermissionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    detail: str | None
+</file>
+
+<file path="servicios/rbac-service/Dockerfile">
+FROM python:3.14-slim
+
+WORKDIR /app
+
+RUN useradd --create-home --shell /bin/bash appuser
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app ./app
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+</file>
+
+<file path="servicios/sync-service/app/__init__.py">
+
+</file>
+
+<file path="servicios/sync-service/app/main.py">
+from fastapi import FastAPI
+
+app = FastAPI(
+    title="Excel Sync Service",
+    version="0.1.0",
+)
+
+
+@app.get("/health")
+def health():
+    return {
+        "service": "sync-service",
+        "status": "healthy",
+    }
+</file>
+
+<file path="servicios/sync-service/Dockerfile">
+FROM python:3.14-slim
+
+WORKDIR /app
+
+RUN useradd --create-home --shell /bin/bash appuser
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app ./app
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+</file>
+
+<file path="servicios/sync-service/requirements.txt">
+fastapi
+uvicorn[standard]
+</file>
+
+<file path="tests/.gitkeep">
+
+</file>
+
+<file path=".env.example">
+# PostgreSQL - Identity
+IDENTITY_DB_NAME=identity_db
+IDENTITY_DB_USER=identity_user
+IDENTITY_DB_PASSWORD=change_me_identity
+
+# PostgreSQL - RBAC
+RBAC_DB_NAME=rbac_db
+RBAC_DB_USER=rbac_user
+RBAC_DB_PASSWORD=change_me_rbac
+
+# PostgreSQL - Sync
+SYNC_DB_NAME=sync_db
+SYNC_DB_USER=sync_user
+SYNC_DB_PASSWORD=change_me_sync
+
+# PostgreSQL - Audit
+AUDIT_DB_NAME=audit_db
+AUDIT_DB_USER=audit_user
+AUDIT_DB_PASSWORD=change_me_audit
+
+# RabbitMQ
+RABBITMQ_USER=devsecops
+RABBITMQ_PASSWORD=change_me_rabbit
+
+# MinIO
+MINIO_ROOT_USER=devsecops
+MINIO_ROOT_PASSWORD=change_me_minio
+
+# Application
+JWT_SECRET_KEY=change_me_in_real_environment
+</file>
+
+<file path=".gitignore">
+# Environment
+.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Secrets
+*.pem
+*.key
+
+# Logs
+*.log
+
+# Temporary
+tmp/
+temp/
+</file>
+
+<file path="LICENSE">
+
+</file>
+
+<file path="README.md">
+
+</file>
+
+<file path="servicios/identity-service/app/main.py">
+import os
+from datetime import datetime, timedelta, timezone
+
+import jwt
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pwdlib import PasswordHash
+from pydantic import BaseModel, ConfigDict, EmailStr
+from sqlalchemy import String, create_engine, select
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+
+
+DATABASE_URL = os.environ["DATABASE_URL"]
+
+JWT_SECRET = os.environ["JWT_SECRET"]
+JWT_ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+
+password_hash = PasswordHash.recommended()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    full_name: Mapped[str] = mapped_column(String(150))
+    password_hash: Mapped[str] = mapped_column(String(255))
+    role: Mapped[str] = mapped_column(String(30), default="viewer")
+    is_active: Mapped[bool] = mapped_column(default=True)
+
+
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    full_name: str
+    password: str
+    role: str = "viewer"
+
+
+class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    username: str
+    email: EmailStr
+    full_name: str
+    role: str
+    is_active: bool
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+
+
+app = FastAPI(
+    title="Identity Service",
+    version="0.2.0",
+)
+
+
+def get_db():
+    db = SessionLocal()
+
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def create_access_token(user: User) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+
+    payload = {
+        "sub": str(user.id),
+        "username": user.username,
+        "role": user.role,
+        "exp": expire,
+    }
+
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+) -> User:
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid or expired token",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(
+            token,
+            JWT_SECRET,
+            algorithms=[JWT_ALGORITHM],
+        )
+
+        user_id = payload.get("sub")
+
+        if user_id is None:
+            raise credentials_exception
+
+    except jwt.PyJWTError as exc:
+        raise credentials_exception from exc
+
+    user = db.get(User, int(user_id))
+
+    if user is None or not user.is_active:
+        raise credentials_exception
+
+    return user
+
+
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
+
+
+@app.get("/health")
+def health():
+    return {
+        "service": "identity-service",
+        "status": "healthy",
+    }
+
+
+@app.post(
+    "/register",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def register(user_data: UserCreate, db: Session = Depends(get_db)):
+
+    existing_user = db.scalar(
+        select(User).where(
+            (User.username == user_data.username)
+            | (User.email == user_data.email)
+        )
+    )
+
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Username or email already registered",
+        )
+
+    user = User(
+        username=user_data.username,
+        email=user_data.email,
+        full_name=user_data.full_name,
+        password_hash=password_hash.hash(user_data.password),
+        role=user_data.role,
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+
+@app.post("/login", response_model=TokenResponse)
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
+
+    user = db.scalar(
+        select(User).where(User.username == form_data.username)
+    )
+
+    if user is None or not password_hash.verify(
+        form_data.password,
+        user.password_hash,
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is inactive",
+        )
+
+    token = create_access_token(user)
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+    }
+
+
+@app.get("/me", response_model=UserResponse)
+def get_me(current_user: User = Depends(get_current_user)):
+    return current_user
+</file>
+
+<file path="servicios/identity-service/requirements.txt">
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg[binary]
+pyjwt
+pwdlib[argon2]
+python-multipart
+email-validator
+</file>
+
+<file path="servicios/rbac-service/app/main.py">
+from fastapi import Depends, FastAPI, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.database import engine, get_db
+from app.models import Application, Base, Permission, Position
+from app.schemas import (
+    ApplicationCreate,
+    ApplicationResponse,
+    PermissionCreate,
+    PermissionResponse,
+    PositionCreate,
+    PositionResponse,
+)
+
+app = FastAPI(
+    title="RBAC Service",
+    version="0.3.0",
+)
+
+
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
+
+
+@app.get("/health")
+def health():
+    return {
+        "service": "rbac-service",
+        "status": "healthy",
+    }
+
+
+@app.get(
+    "/applications",
+    response_model=list[ApplicationResponse],
+)
+def list_applications(db: Session = Depends(get_db)):
+    return db.scalars(
+        select(Application).order_by(Application.id)
+    ).all()
+
+
+@app.post(
+    "/applications",
+    response_model=ApplicationResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_application(
+    application_data: ApplicationCreate,
+    db: Session = Depends(get_db),
+):
+    existing_application = db.scalar(
+        select(Application).where(
+            (Application.name == application_data.name)
+            | (Application.code == application_data.code)
+        )
+    )
+
+    if existing_application:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Application name or code already exists",
+        )
+
+    application = Application(
+        name=application_data.name,
+        code=application_data.code,
+    )
+
+    db.add(application)
+    db.commit()
+    db.refresh(application)
+
+    return application
+
+@app.get(
+    "/positions",
+    response_model=list[PositionResponse],
+)
+def list_positions(db: Session = Depends(get_db)):
+    return db.scalars(
+        select(Position).order_by(Position.id)
+    ).all()
+
+
+@app.post(
+    "/positions",
+    response_model=PositionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_position(
+    position_data: PositionCreate,
+    db: Session = Depends(get_db),
+):
+    existing_position = db.scalar(
+        select(Position).where(
+            (Position.company_id == position_data.company_id)
+            & (Position.code == position_data.code)
+        )
+    )
+
+    if existing_position:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Position code already exists for this company",
+        )
+
+    position = Position(
+        company_id=position_data.company_id,
+        name=position_data.name,
+        code=position_data.code,
+    )
+
+    db.add(position)
+    db.commit()
+    db.refresh(position)
+
+    return position
+
+@app.get(
+    "/permissions",
+    response_model=list[PermissionResponse],
+)
+def list_permissions(db: Session = Depends(get_db)):
+    return db.scalars(
+        select(Permission).order_by(Permission.id)
+    ).all()
+
+
+@app.post(
+    "/permissions",
+    response_model=PermissionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_permission(
+    permission_data: PermissionCreate,
+    db: Session = Depends(get_db),
+):
+    existing_permission = db.scalar(
+        select(Permission).where(
+            Permission.name == permission_data.name
+        )
+    )
+
+    if existing_permission:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Permission name already exists",
+        )
+
+    permission = Permission(
+        name=permission_data.name,
+        detail=permission_data.detail,
+    )
+
+    db.add(permission)
+    db.commit()
+    db.refresh(permission)
+
+    return permission
+</file>
+
+<file path="servicios/rbac-service/requirements.txt">
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg[binary]
+pyjwt
+pydantic-settings
+</file>
+
+<file path="docker-compose.yml">
+services:
+
+  # =========================================================
+  # DATABASES
+  # =========================================================
+
+  identity-db:
+    image: postgres:17-alpine
+    container_name: identity-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${IDENTITY_DB_NAME}
+      POSTGRES_USER: ${IDENTITY_DB_USER}
+      POSTGRES_PASSWORD: ${IDENTITY_DB_PASSWORD}
+    volumes:
+      - identity_db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  rbac-db:
+    image: postgres:17-alpine
+    container_name: rbac-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${RBAC_DB_NAME}
+      POSTGRES_USER: ${RBAC_DB_USER}
+      POSTGRES_PASSWORD: ${RBAC_DB_PASSWORD}
+    volumes:
+      - rbac_db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  sync-db:
+    image: postgres:17-alpine
+    container_name: sync-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${SYNC_DB_NAME}
+      POSTGRES_USER: ${SYNC_DB_USER}
+      POSTGRES_PASSWORD: ${SYNC_DB_PASSWORD}
+    volumes:
+      - sync_db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  audit-db:
+    image: postgres:17-alpine
+    container_name: audit-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${AUDIT_DB_NAME}
+      POSTGRES_USER: ${AUDIT_DB_USER}
+      POSTGRES_PASSWORD: ${AUDIT_DB_PASSWORD}
+    volumes:
+      - audit_db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  # =========================================================
+  # MESSAGE BROKER
+  # =========================================================
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend
+
+  # =========================================================
+  # OBJECT STORAGE
+  # =========================================================
+
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - backend
+
+  # =========================================================
+  # API GATEWAY
+  # =========================================================
+
+  api-gateway:
+    build:
+      context: ./servicios/api-gateway
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+
+  # =========================================================
+  # IDENTITY SERVICE
+  # =========================================================
+
+  identity-service:
+    build:
+      context: ./servicios/identity-service
+    container_name: identity-service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://${IDENTITY_DB_USER}:${IDENTITY_DB_PASSWORD}@identity-db:5432/${IDENTITY_DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - backend
+
+  # =========================================================
+  # RBAC SERVICE
+  # =========================================================
+
+  rbac-service:
+    build:
+      context: ./servicios/rbac-service
+    container_name: rbac-service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://${RBAC_DB_USER}:${RBAC_DB_PASSWORD}@rbac-db:5432/${RBAC_DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - backend
+
+  # =========================================================
+  # SYNC SERVICE
+  # =========================================================
+
+  sync-service:
+    build:
+      context: ./servicios/sync-service
+    container_name: sync-service
+    restart: unless-stopped
+    networks:
+      - backend
+
+  # =========================================================
+  # AUDIT SERVICE
+  # =========================================================
+
+  audit-service:
+    build:
+      context: ./servicios/audit-service
+    container_name: audit-service
+    restart: unless-stopped
+    networks:
+      - backend
+
+  # =========================================================
+  # EXCEL WORKER
+  # =========================================================
+
+  excel-worker:
+    build:
+      context: ./servicios/excel-worker
+    container_name: excel-worker
+    restart: unless-stopped
+    networks:
+      - backend
+
+# =========================================================
+# VOLUMES
+# =========================================================
+
+volumes:
+  identity_db_data:
+  rbac_db_data:
+  sync_db_data:
+  audit_db_data:
+  rabbitmq_data:
+  minio_data:
+
+# =========================================================
+# NETWORK
+# =========================================================
+
+networks:
+  backend:
+    driver: bridge
+</file>
+
+<file path="servicios/api-gateway/app/main.py">
+from fastapi import FastAPI, HTTPException, Request, Response
+import httpx
+
+app = FastAPI(
+    title="DevSecOps RBAC API Gateway",
+    version="0.3.0",
+)
+
+SERVICES = {
+    "identity": "http://identity-service:8000",
+    "rbac": "http://rbac-service:8000",
+    "sync": "http://sync-service:8000",
+    "audit": "http://audit-service:8000",
+}
+
+
+@app.get("/health")
+def health():
+    return {
+        "service": "api-gateway",
+        "status": "healthy",
+    }
+
+
+@app.get("/api/{service}/health")
+async def service_health(service: str):
+    if service not in SERVICES:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Unknown service: {service}",
+        )
+
+    url = f"{SERVICES[service]}/health"
+
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(url)
+
+        return {
+            "gateway": "healthy",
+            "service": service,
+            "service_status": response.json(),
+        }
+
+    except httpx.RequestError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Service unavailable: {service}",
+        ) from exc
+
+
+@app.api_route(
+    "/api/{service}/{path:path}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+)
+async def proxy_request(
+    service: str,
+    path: str,
+    request: Request,
+):
+    if service not in SERVICES:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Unknown service: {service}",
+        )
+
+    url = f"{SERVICES[service]}/{path}"
+
+    body = await request.body()
+
+    headers = dict(request.headers)
+    headers.pop("host", None)
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.request(
+                method=request.method,
+                url=url,
+                content=body,
+                headers=headers,
+                params=request.query_params,
+            )
+
+        return Response(
+            content=response.content,
+            status_code=response.status_code,
+            headers={
+                "content-type": response.headers.get(
+                    "content-type",
+                    "application/json",
+                )
+            },
+        )
+
+    except httpx.RequestError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Service unavailable: {service}",
+        ) from exc
+</file>
+
+</files>
